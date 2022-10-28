@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "lasttime": "2022-10-27 14:23:54",
+  "author": "申龙",
+  "className": "idmdatasource",
+  "module": [
+    {
+      "classId": "idm.component.idmdatasource.idatasourceactionpanel",
+      "comName": "数据源管理",
+      "className": "IDataSourceActionPanel",
+      "comType": "common",
+      "comLangue": "vue"
+    }
+  ]
+}
