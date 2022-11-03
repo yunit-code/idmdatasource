@@ -371,7 +371,7 @@
           :wrapper-col="formItemLayout.wrapperCol">
           <span slot="label">
             {{form.getFieldValue('type')=='4'?'SQL参数':'请求参数'}}
-            <a-tooltip :title="form.getFieldValue('type')=='4'?'请根据SQL语句中的问号数量按需填写参数，否则将执行失败，请注意参数的顺序':'请求地址所需要的参数，支持IDM表达式的方式。'">
+            <a-tooltip :title="(form.getFieldValue('type')=='4'?'请根据SQL语句中的问号数量按需填写参数，否则将执行失败，请注意参数的顺序。':'请求地址所需要的参数，支持IDM表达式的方式。')+'例如：此处填写(举例url中有abc=123的参数) @[url(\'abc\')+\'---\'+abc]，组件传递了 {abc:4567} ，则这里替换后则为 123---4567'">
               <a-icon type="question-circle-o" />
             </a-tooltip>
           </span>
@@ -427,11 +427,16 @@
 
 
         </a-form-item>
-        <a-form-item label='请求头信息'
+        <a-form-item
         v-if="form.getFieldValue('type')=='1'"
           :label-col="formItemLayout.labelCol"
           :wrapper-col="formItemLayout.wrapperCol">
-          
+          <span slot="label">
+            请求头信息
+            <a-tooltip title="如果参数值为IDM表达式则支持动态获取非固定值。例如：此处填写(举例url中有abc=123的参数) @[url('abc')+'---'+abc]，组件传递了 {abc:4567} ，则这里替换后则为 123---4567">
+              <a-icon type="question-circle-o" />
+            </a-tooltip>
+          </span>
           <a-input
             style="display:none"
             v-decorator="[

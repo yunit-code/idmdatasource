@@ -129,6 +129,8 @@
         <div slot="action" slot-scope="text, record, index">
           <a @click="editDataRow(record, index)">编辑</a>
           <a-divider style="margin:0 5px" type="vertical" />
+          <a @click="showDataSourceDebugFormModal(record, index)">调试</a>
+          <a-divider style="margin:0 5px" type="vertical" />
           <a @click="delDataRow(record, index)">删除</a>
           <a-divider style="margin:0 5px" type="vertical" />
           <a @click="copyDataRow(record, index)">复制</a>
@@ -287,6 +289,13 @@
       @cancel="DataSourceFormVisible=false;DataSourceFormDefaultData = {}"
       @create="saveCustomModuleFormHandleCreate"
     />
+    <DataSourceFormDebug
+      ref="DataSourceFormDebug"
+      :visible="DataSourceFormDebugVisible"
+      :defaultValue.sync="DataSourceFormDebugDefaultData"
+      destroyOnClose
+      @cancel="DataSourceFormDebugVisible=false;DataSourceFormDebugDefaultData = {}"
+    />
   </div>
 </template>
 
@@ -310,10 +319,12 @@ const columns = [
   },
 ];
 import DataSourceForm from '../innerComponents/DataSourceForm.vue'
+import DataSourceFormDebug from '../innerComponents/DataSourceFormDebug.vue'
 export default {
   name: "IDataSourceActionPanel",
   components:{
-    DataSourceForm
+    DataSourceForm,
+    DataSourceFormDebug
   },
   data() {
     return {
@@ -355,7 +366,9 @@ export default {
           ? [].concat(IDM.setting.develop.dataSourceConditionProductList)
           : [],
       DataSourceFormVisible:false,
-      DataSourceFormDefaultData:{}
+      DataSourceFormDefaultData:{},
+      DataSourceFormDebugVisible:false,
+      DataSourceFormDebugDefaultData:{}
     };
   },
   created() {
@@ -686,6 +699,13 @@ export default {
               }
           })
     },
+    showDataSourceDebugFormModal(fromInfo){
+      fromInfo = _.cloneDeep(fromInfo)
+      fromInfo.type=fromInfo.type+"";
+      fromInfo.isEditInfo = true;
+      this.DataSourceFormDebugDefaultData = fromInfo;
+      this.DataSourceFormDebugVisible = true;
+    },
     showDataSourceFormModal(fromInfo){
       fromInfo = _.cloneDeep(fromInfo)
       if(fromInfo){
@@ -725,7 +745,6 @@ export default {
         // if(fromInfo.headerJson){
         //   fromInfo.headerJson = JSON.parse(fromInfo.headerJson)
         // }
-        debugger
         this.DataSourceFormDefaultData = fromInfo;
       }else{
         this.DataSourceFormDefaultData = {};
