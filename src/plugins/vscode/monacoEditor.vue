@@ -52,6 +52,10 @@ export default {
       type: Number,
       default: 0,
     },
+    lineNumbersMinChars: {
+      type: Number,
+      default: 5
+    }
   },
   data() {
     return {
@@ -80,6 +84,7 @@ export default {
         // value: this.code,
         language: this.language,
         theme: this.theme,
+        lineNumbersMinChars: 2
       });
     },
   },

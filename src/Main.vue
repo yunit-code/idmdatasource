@@ -1,5 +1,5 @@
 <template>
-    <component :is="`${componentName}`" :ref="`${componentName}`"/>
+  <component :is="`${componentName}`" :ref="`${componentName}`" />
 </template>
 
 <script>
@@ -7,15 +7,15 @@
 export default {
   name: 'Main',
   components: {
-    
+
   },
-  data(){
+  data() {
     return {
-      componentName:""
+      componentName: ""
     }
   },
   props: {
-    
+
   },
   created() {
   },
@@ -29,6 +29,9 @@ export default {
 </script>
 
 <style lang="scss">
-#app{
+#app {}
+
+.ant-select-tree {
+  max-height: 300px;
 }
 </style>

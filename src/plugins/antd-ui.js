@@ -54,7 +54,7 @@ import {
   Timeline,
   Tooltip,
   Upload,
-  // Drawer,
+  Drawer,
   Skeleton,
   Comment,
   ConfigProvider,
@@ -84,7 +84,7 @@ Vue.use(Checkbox);
 Vue.use(Col);
 Vue.use(DatePicker);
 Vue.use(Divider);
-// Vue.use(Drawer);
+Vue.use(Drawer);
 Vue.use(Dropdown);
 Vue.use(Form);
 Vue.use(Icon);

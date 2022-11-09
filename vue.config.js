@@ -117,15 +117,14 @@ module.exports = {
     },
     configureWebpack: {
       plugins: [
+        // new MonacoWebpackPlugin({
+        //   filename: `${assetsDir}/js/[name].worker.js`
+        // }),
         new MiniCssExtractPlugin({
           // 修改打包后css文件名
           filename: `${assetsDir}/css/[name].css`,
           chunkFilename: `${assetsDir}/css/[name].css`
         })
-        // ,
-        // new MonacoWebpackPlugin({
-        //   languages: ['javascript','json']
-        // })
       ],
       output: {
         // 输出重构  打包编译后的 文件名称
