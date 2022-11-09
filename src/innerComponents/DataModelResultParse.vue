@@ -48,8 +48,9 @@
         <a-input placeholder="关联的父级表名(如果不存在可为空)+_+关联的父级字段，可修改" style="width: 200px" size="small"
           v-model="item.relationTableFiled" />
       </div>
-      <a-table :scroll="{ x: item.columns.length > 4 ? item.columns.length * 210 : false }" class="idm-dm-generate-table" :pagination="false"
-        size="small" bordered :columns="item.columns" :data-source="item.tableData"></a-table>
+      <a-table :scroll="{ x: item.columns.length > 4 ? item.columns.length * 210 : false }"
+        class="idm-dm-generate-table" :pagination="false" size="small" bordered :columns="item.columns"
+        :data-source="item.tableData"></a-table>
     </div>
 
   </div>
@@ -101,7 +102,6 @@ export default {
       tableData: [], // testResult.data,
       readonlyTableData: Object.freeze([]), // 只读，用来查找使用，提升性能
       selectedRowKeys: [],
-      resultJson: '', // 传参用
       bottomTableList: [{
         customTableName: '',
         relationTableFiled: '',
@@ -160,9 +160,7 @@ export default {
       const selectRowIds = this.selectedRowKeys
       this.bottomTableList = []
       if (selectRowIds.length === 0) return  // 选中为空直接返回
-      const tableData = _.cloneDeep(this.tableData)
-      const resultJson = this.handleSetTableSelectedTree(tableData, selectRowIds)
-      this.resultJson = JSON.stringify(resultJson)
+      this.handleSetTableSelectedTree(this.tableData, selectRowIds)
     },
     // 主逻辑，生成下面表格
     handleSetTableSelectedTree(tableData, selectRowIds) {
@@ -204,13 +202,12 @@ export default {
         if (!el.children || el.children.length === 0) return
         this.handleSetTableSelectedTree(el.children, selectRowIds)
       })
-      return tableData
     },
     // 提供给父组件使用，获取参数
     getParams() {
       return {
         // 上面表格
-        resultJson: this.resultJson,
+        resultJson: JSON.stringify(this.tableData),
         // 下面预览
         dataTableListJson: JSON.stringify(this.bottomTableList),
 

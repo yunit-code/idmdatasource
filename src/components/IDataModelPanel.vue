@@ -116,9 +116,6 @@
                 <a-descriptions-item label="请求头信息" :span="3">
                   {{ record.headerJson }}
                 </a-descriptions-item>
-                <a-descriptions-item label="调试结果" :span="3">
-                  {{ record.debugResult }}
-                </a-descriptions-item>
               </a-descriptions>
             </div>
             <!--Excel文件-->
@@ -129,9 +126,6 @@
                 </a-descriptions-item>
                 <a-descriptions-item label="文件内容">
                   {{ record.fileContent }}
-                </a-descriptions-item>
-                <a-descriptions-item label="调试结果">
-                  {{ record.debugResult }}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
@@ -144,9 +138,6 @@
                 <a-descriptions-item label="SQL语句">
                   {{ record.dbSql }}
                 </a-descriptions-item>
-                <a-descriptions-item label="调试结果">
-                  {{ record.debugResult }}
-                </a-descriptions-item>
               </a-descriptions>
             </div>
             <!--数据源类型-->
@@ -157,9 +148,6 @@
                 </a-descriptions-item>
                 <a-descriptions-item label="SQL语句">
                   {{ record.dbSql }}
-                </a-descriptions-item>
-                <a-descriptions-item label="调试结果">
-                  {{ record.debugResult }}
                 </a-descriptions-item>
               </a-descriptions>
             </div>
@@ -384,6 +372,18 @@ export default {
     propDataWatchHandle(propData) {
       this.propData = propData.compositeAttr || {};
       this.convertAttrToStyleObject();
+    },
+    downloadFile(record) {
+      const elink = document.createElement('a');
+      elink.download = record.fileName;
+      elink.style.display = 'none';
+      const blob = new Blob([record.fileContent], { type: 'application/' + record.fileName.split(".")[record.fileName.split(".").length - 1] });
+      const href = URL.createObjectURL(blob);
+      elink.href = href;
+      document.body.appendChild(elink);
+      elink.click();
+      document.body.removeChild(elink);
+      window.URL.revokeObjectURL(href);
     },
     // 通过类型获取当前更新状态
     getCurrentPullType(pullType) {
