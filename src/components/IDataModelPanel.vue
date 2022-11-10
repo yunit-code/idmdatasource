@@ -87,10 +87,16 @@
                 <a-tag :key="tindex" v-if="item">{{ item }}</a-tag>
               </template>
             </a-descriptions-item>
-            <a-descriptions-item label="标签" :span="3">
-              <template v-for="(item, tindex) in record.tags.split(',')">
-                <a-tag :key="tindex" v-if="item">{{ item }}</a-tag>
-              </template>
+            <a-descriptions-item label="更新周期" :span="1">
+              {{ updateTypeMap.find(el => el.value == record.updateCycleType).text || '' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="更新频率" :span="1" v-if="record.updateCycleType == 2">
+              {{ updateRateTypeMap.find(el => el.value == record.updateRateType).text || '' }}
+            </a-descriptions-item>
+            <a-descriptions-item label="每日" :span="1" v-if="record.updateCycleType == 2">
+              <span v-if="record.updateRateType == 1">{{ getDay(record.day) }}</span>
+              <span v-if="record.updateRateType == 2">{{ record.hour }}</span>
+              <span v-if="record.updateRateType == 2">{{ record.minute }}</span>
             </a-descriptions-item>
             <a-descriptions-item label="描述" :span="3">
               {{ record.remark }}
@@ -146,9 +152,6 @@
                 <a-descriptions-item label="数据源名称">
                   {{ record.dataSourceText }}
                 </a-descriptions-item>
-                <a-descriptions-item label="SQL语句">
-                  {{ record.dbSql }}
-                </a-descriptions-item>
               </a-descriptions>
             </div>
 
@@ -159,20 +162,19 @@
     <!-- 类型选择 -->
     <a-modal :visible="chooseDataModelTypeVisible" :footer="null" wrapClassName="idm-dm-type"
       :bodyStyle="{ 'padding': '18px', display: 'flex', 'flex-wrap': 'wrap' }" width="680px"
-      :title="currentType === 1 ? '添加数据模型' : '修改数据模型'" @cancel="() => chooseDataModelTypeVisible = false">
-      <div v-for="(item, index) in dataModelType" :key="index" class="idm-dm-type-box"
+      :title="currentData.isEditInfo === 1 ? '修改数据模型' : '添加数据模型'" @cancel="() => chooseDataModelTypeVisible = false">
+      <div v-for="(item, index) in ConditionType.filter(el => el.text !== '全部')" :key="index" class="idm-dm-type-box"
         @click="handelChooseModelType(item)" :class="currentData.type == item.value ? 'active' : ''">
-        <svg-icon :iconClass="item.icon" className="modal-type-icon"></svg-icon>
-        <div class="modal-type-title">{{ item.label }}</div>
-        <div class="modal-type-desc">{{ item.desc }}</div>
+        <svg-icon :iconClass="typeOtherMap[item.value].icon" className="modal-type-icon"></svg-icon>
+        <div class="modal-type-title">{{ typeOtherMap[item.value].title }}</div>
+        <div class="modal-type-desc">{{ typeOtherMap[item.value].desc }}</div>
       </div>
     </a-modal>
     <!-- 主要流程drawer -->
     <DataModelDrawer v-model="dataModalDrawerShow" ref="DataSourceForm" :visible="DataSourceFormVisible"
       :defaultValue.sync="currentData" :ConditionGroup="ConditionGroup" :ConditionType="ConditionType"
-      :dataModelType="dataModelType" :ConditionModuleList="ConditionModuleList"
-      :ConditionProductList="ConditionProductList" :destroyOnClose="true" @handleComplete="handleDataModelComplete"
-      @create="saveCustomModuleFormHandleCreate">
+      :ConditionModuleList="ConditionModuleList" :ConditionProductList="ConditionProductList" :destroyOnClose="true"
+      @handleComplete="handleDataModelComplete" @create="saveCustomModuleFormHandleCreate">
     </DataModelDrawer>
     <!-- 选择数据源 -->
     <DataSourceSelect v-model="dataSourceSelectShow" @closeDataSource="closeDataSource"
@@ -188,6 +190,7 @@ import DataModelDrawer from '../innerComponents/DataModelDrawer'
 import DataSourceSelect from '../innerComponents/DataSourceSelect'
 import DataModalUpdateRecordsModal from '../innerComponents/DataModalUpdateRecordsModal'
 import apis from '../api/dataModalUrls'
+import { updateTypeMap, updateRateTypeMap } from '../utils/stateMap'
 const columns = [
   { title: "名称", dataIndex: "title", width: 240, key: "title", ellipsis: true, sorter: true },
   {
@@ -212,32 +215,28 @@ const columns = [
     scopedSlots: { customRender: "action" },
   },
 ];
-const dataModelType = [
-  {
-    label: '数据源建模',
+const typeOtherMap = {
+  1: {
+    title: '数据源建模',
     desc: '现有数据源新建数据表',
     icon: 'dataSource',
-    value: '1'
   },
-  {
-    label: 'SQL建模',
+  2: {
+    title: 'SQL建模',
     desc: '使用sql查询生成数据表',
     icon: 'SQL',
-    value: '2'
   },
-  {
-    label: 'Excel上传',
+  3: {
+    title: 'Excel上传',
     desc: '上传本地文件(.xls,.xlsx)',
     icon: 'Excel',
-    value: '3'
   },
-  {
-    label: 'API链接',
+  4: {
+    title: 'API链接',
     desc: '抓取API数据生成表格',
     icon: 'API',
-    value: '4'
   }
-]
+}
 export default {
   name: 'IDataModel',
   components: {
@@ -254,11 +253,13 @@ export default {
         type: 1,
         title: 12
       }],
+      typeOtherMap,
+      updateTypeMap,
+      updateRateTypeMap,
       columns,
       pageSize: 10,
       current: 1,
       totalCount: 0,
-      dataModelType,
       currentData: {},
       condition: {
         TYPE: "",
@@ -272,24 +273,17 @@ export default {
       dataModalUpdateRecordsDrawerShow: false,
       dataSourceSelectShow: false,
       ConditionGroup:
-        IDM.setting?.develop?.dataSourceConditionGroup instanceof Array
+        IDM.setting.develop.dataModelConditionGroup instanceof Array
           ? [{ text: "全部", value: "" }].concat(
-            IDM.setting.develop.dataSourceConditionGroup
+            IDM.setting.develop.dataModelConditionGroup
           )
           : [],
-      // ConditionType:
-      //   IDM.setting?.develop?.dataModelConditionType instanceof Array
-      //     ? [{ text: "全部", value: "" }].concat(
-      //       IDM.setting.develop.dataSourceConditionType
-      //     )
-      //     : [],
-      ConditionType: [
-        { text: "全部", value: "" },
-        { text: "数据源", value: "1" },
-        { text: "SQL", value: "2" },
-        { text: "Excel文件", value: "3" },
-        { text: "接口API", value: "4" },
-      ],
+      ConditionType:
+        IDM.setting.develop.dataModelConditionType instanceof Array
+          ? [{ text: "全部", value: "" }].concat(
+            IDM.setting.develop.dataModelConditionType
+          )
+          : [],
       // ConditionPullType:
       //   IDM.setting?.develop?.ConditionPullType instanceof Array
       //     ? [].concat(IDM.setting.develop.ConditionPullType)
@@ -299,7 +293,7 @@ export default {
         { text: "更新失败", value: "-1", color: 'red' },
         { text: "未同步", value: "0", color: '' },
         { text: "同步成功", value: "1", color: 'green' },
-        { text: "更新中...", value: "2", color: 'blue' },
+        { text: "更新中", value: "2", color: 'blue' },
       ],
       ConditionProductList:
         IDM.setting?.develop?.dataSourceConditionProductList instanceof Array
@@ -308,43 +302,43 @@ export default {
     }
   },
   created() {
-    //数据源分组
+    //分组
     if (
-      !IDM.develop.cacheData.DataSourceConditionGroupList &&
-      IDM.type(IDM.setting.develop.dataSourceConditionGroup) == "string"
+      !IDM.develop.cacheData.DataModelConditionGroupList &&
+      IDM.type(IDM.setting.develop.dataModelConditionGroup) == "string"
     ) {
-      IDM.http.get(IDM.setting.develop.dataSourceConditionGroup).then((res) => {
+      IDM.http.get(IDM.setting.develop.dataModelConditionGroup).then((res) => {
         let resultData = [{ text: "全部", value: "" }];
         if (res.data.code == 200) {
           resultData = resultData.concat(res.data.data);
         }
-        IDM.develop.cacheData.DataSourceConditionGroupList = resultData;
+        IDM.develop.cacheData.DataModelConditionGroupList = resultData;
         this.ConditionGroup = resultData;
       });
     } else if (
-      IDM.type(IDM.setting.develop.dataSourceConditionGroup) == "string"
+      IDM.type(IDM.setting.develop.dataModelConditionGroup) == "string"
     ) {
-      this.ConditionGroup = IDM.develop.cacheData.DataSourceConditionGroupList;
+      this.ConditionGroup = IDM.develop.cacheData.DataModelConditionGroupList;
     }
-    //类型分组
-    // if (
-    //   !IDM.develop.cacheData.DataSourceConditionTypeList &&
-    //   IDM.type(IDM.setting.develop.dataSourceConditionType) == "string"
-    // ) {
-    //   IDM.http.get(IDM.setting.develop.dataSourceConditionType).then((res) => {
-    //     let resultData = [{ text: "全部", value: "" }];
-    //     if (res.data.code == 200) {
-    //       resultData = resultData.concat(res.data.data);
-    //     }
-    //     IDM.develop.cacheData.DataSourceConditionTypeList = resultData;
-    //     this.ConditionType = resultData;
-    //   });
-    // } else if (
-    //   IDM.type(IDM.setting.develop.dataSourceConditionType) == "string"
-    // ) {
-    //   this.ConditionType = IDM.develop.cacheData.DataSourceConditionTypeList;
-    // }
-    //产品分组
+    //类型
+    if (
+      !IDM.develop.cacheData.DataModelConditionTypeList &&
+      IDM.type(IDM.setting.develop.dataModelConditionType) == "string"
+    ) {
+      IDM.http.get(IDM.setting.develop.dataModelConditionType).then((res) => {
+        let resultData = [{ text: "全部", value: "" }];
+        if (res.data.code == 200) {
+          resultData = resultData.concat(res.data.data);
+        }
+        IDM.develop.cacheData.DataModelConditionTypeList = resultData;
+        this.ConditionType = resultData;
+      });
+    } else if (
+      IDM.type(IDM.setting.develop.dataModelConditionType) == "string"
+    ) {
+      this.ConditionType = IDM.develop.cacheData.DataModelConditionTypeList;
+    }
+    //产品
     if (
       !IDM.develop.cacheData.DataSourceConditionProductList &&
       IDM.type(IDM.setting.develop.dataSourceConditionProductList) == "string"
@@ -372,6 +366,9 @@ export default {
     propDataWatchHandle(propData) {
       this.propData = propData.compositeAttr || {};
       this.convertAttrToStyleObject();
+    },
+    getDay(day) {
+      return day?.split(' ')?.[1]?.substr(0, 5) || ' '
     },
     downloadFile(record) {
       const elink = document.createElement('a');

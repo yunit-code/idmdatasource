@@ -48,35 +48,14 @@
 
 <script>
 //导入代码编辑器
-const updateTypeMap = [
-  {
-    label: '手动更新',
-    value: 1
-  },
-  {
-    label: '定时更新',
-    value: 2
-  }
-]
-const updateRateTypeMap = [
-  {
-    label: '天级',
-    value: 1
-  },
-  {
-    label: '小时级',
-    value: 2
-  }
-]
-
+import { updateTypeMap, updateRateTypeMap } from '../utils/stateMap'
 export default {
   name: 'DataModelUpdateSetting',
   components: {
   },
   data() {
     return {
-      updateTypeMap,
-      updateRateTypeMap
+      updateTypeMap, updateRateTypeMap
     }
   },
   model: {

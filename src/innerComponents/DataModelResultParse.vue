@@ -13,8 +13,12 @@
         <a-input placeholder="字段重命名" size="small" @change="handleGenerateBottomTable" v-if="record.dataType == 2"
           v-model="record.customName" />
         <!-- 表名 -->
-        <a-input placeholder="随机生成的表名，可修改" @change="handleGenerateBottomTable" style="width: 208%" size="small"
-          v-if="record.dataType == 1" v-model="record.customTableName" />
+        <a-input placeholder="随机生成的表名，可修改" @change="handleGenerateBottomTable" style="width: 205%" size="small"
+          v-if="record.dataType == 1" v-model="record.customTableName">
+          <a-tooltip slot="suffix" :getPopupContainer="getPopupContainer" title="随机生成的表名，可修改">
+            <a-icon type="info-circle" style="color: rgba(0,0,0,.35)" />
+          </a-tooltip>
+        </a-input>
       </template>
       <template #type="text, record">
         <a-select size="small" style="width: 100%" @change="handleGenerateBottomTable" v-if="record.dataType == 2"
@@ -22,13 +26,14 @@
           <a-select-option :value="1">文本</a-select-option>
           <a-select-option :value="2">数值</a-select-option>
           <a-select-option :value="3">长文本</a-select-option>
+          <a-select-option :value="4">时间</a-select-option>
         </a-select>
       </template>
       <template #showName="text, record">
         <a-input placeholder="中文名" size="small" @change="handleGenerateBottomTable" v-if="record.dataType == 2"
           v-model="record.showName" />
         <!-- 关联父级字段 -->
-        <a-select placeholder="关联父级字段" size="small" style="width: 223%" @change="handleGenerateBottomTable"
+        <a-select placeholder="关联父级字段" size="small" style="width: 220%" @change="handleGenerateBottomTable"
           v-if="record.dataType == 1" v-model="record.fidFiled">
           <a-select-option v-for="item, index in getParentFields(record)" :key="index" :value="item.customName">{{
               item.customName
@@ -57,7 +62,7 @@
 </template>
 
 <script>
-// import { testResult } from '../mockData/dataModal'
+import { testResult } from '../mockData/dataModal'
 const columns = [
   {
     title: '解析字段',
@@ -99,7 +104,7 @@ export default {
   data() {
     return {
       columns,
-      tableData: [], // testResult.data,
+      tableData: testResult.data,
       readonlyTableData: Object.freeze([]), // 只读，用来查找使用，提升性能
       selectedRowKeys: [],
       bottomTableList: [{
@@ -129,6 +134,9 @@ export default {
     }
   },
   methods: {
+    getPopupContainer() {
+      return document.getElementsByClassName('ant-drawer-content-wrapper')[0]
+    },
     getParentFields(record) {
       const { fid } = record  // 父级id
       if (!fid) return []

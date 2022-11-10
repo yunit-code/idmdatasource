@@ -7,7 +7,8 @@ export default {
     // 保存
     requestSaveDataModel: (params) => IDM.http.post('/ctrl/idm/datamodel/save', params, customParams),
     // 列表
-    requestModelList: (params) => IDM.http.get('/ctrl/idm/datamodel/getList', params),
+    requestModelList: (params) =>
+        IDM.http.get(IDM.setting.api.dataModelFetchListApi || '/ctrl/idm/datamodel/getList', params),
     // 更新
     requestUpdateDataModel: (params) => IDM.http.post('/ctrl/idm/datamodel/updateData', params, customParams),
     // 删除

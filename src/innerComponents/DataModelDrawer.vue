@@ -34,7 +34,7 @@
       <div style="height:calc(100vh - 215px);overflow: auto;padding: 0 10px" class="scrollbar_style">
         <!--------------- step 0 --------------- -->
         <a-form layout='horizontal' :form="form" v-show="currentStep === 0">
-          <a-input style="display:none" size="small" v-decorator="[
+          <a-input style="display:none" v-decorator="[
             'type',
             {
               initialValue: defaultValue.type,
@@ -55,7 +55,7 @@
                     <a-icon type="info-circle" />
                   </a-tooltip>
                 </span>
-                <a-input placeholder="请输入" size="small" v-decorator="[
+                <a-input placeholder="请输入" v-decorator="[
                   'title',
                   {
                     initialValue: defaultValue.title,
@@ -65,7 +65,7 @@
 
               </a-form-item>
               <a-form-item label='共享属性' :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <a-radio-group size="small" v-decorator="['shareType',
+                <a-radio-group v-decorator="['shareType',
                 {
                   initialValue: defaultValue.shareType,
                   rules: [{ required: true, message: '请选择共享属性!' }],
@@ -79,7 +79,7 @@
                 </a-radio-group>
               </a-form-item>
               <a-form-item label='作者' :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <a-input size="small" placeholder="请输入" v-decorator="[
+                <a-input placeholder="请输入" v-decorator="[
                   'author',
                   {
                     initialValue: defaultValue.author,
@@ -88,8 +88,8 @@
                 ]" />
               </a-form-item>
               <a-form-item label='所属分组' :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <a-select :getPopupContainer="getPopupContainer" size="small" allowClear
-                  dropdownClassName="idm_dev_theme" v-decorator="['groupId',
+                <a-select :getPopupContainer="getPopupContainer" allowClear dropdownClassName="idm_dev_theme"
+                  v-decorator="['groupId',
                   {
                     initialValue: defaultValue.groupId,
                     rules: [{ required: true, message: '请选择分组!' }],
@@ -108,8 +108,8 @@
                     <a-icon type="question-circle-o" />
                   </a-tooltip>
                 </span>
-                <a-select :getPopupContainer="getPopupContainer" size="small" allowClear labelInValue
-                  optionFilterProp="children" dropdownClassName="idm_dev_theme" mode="multiple" v-decorator="['productArray',
+                <a-select :getPopupContainer="getPopupContainer" allowClear labelInValue optionFilterProp="children"
+                  dropdownClassName="idm_dev_theme" mode="multiple" v-decorator="['productArray',
                   {
                     initialValue: defaultValue.productArray,
                     rules: [],
@@ -119,26 +119,8 @@
                   </a-select-option>
                 </a-select>
               </a-form-item>
-              <a-form-item :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <span slot="label">
-                  标签
-                  <a-tooltip :getPopupContainer="getPopupContainer" title="选择或输入返回结果中有哪些关键词，通过关键词可以在选择的时候能快速选到组件想要的数据源">
-                    <a-icon type="question-circle-o" />
-                  </a-tooltip>
-                </span>
-                <a-select size="small" :getPopupContainer="getPopupContainer" allowClear
-                  dropdownClassName="idm_dev_theme" mode="tags" v-decorator="['tags',
-                  {
-                    initialValue: defaultValue.tags || [],
-                    rules: [],
-                  }]">
-                  <a-select-option v-for="item in tagsList" :key="item">
-                    {{ item }}
-                  </a-select-option>
-                </a-select>
-              </a-form-item>
               <a-form-item label='描述' :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <a-textarea size="small" placeholder="请输入" v-decorator="[
+                <a-textarea placeholder="请输入" v-decorator="[
                   'remark',
                   {
                     initialValue: defaultValue.remark,
@@ -147,27 +129,26 @@
                 ]" />
               </a-form-item>
               <a-form-item label="排序" :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
-                <a-input-number placeholder="请输入" size="small"
+                <a-input-number placeholder="请输入"
                   v-decorator="['itemIndex', { initialValue: defaultValue.itemIndex || 1 }]" :min="1" :max="10000" />
               </a-form-item>
             </a-collapse-panel>
-            <a-collapse-panel v-if="isShowBottomCollapse" key="2" forceRender :header="subLabelMap[defaultValue.type]"
-              :style="{ border: 0 }">
+            <a-collapse-panel v-if="isShowSecondCollapse" key="2" forceRender
+              :header="subLabelMap[defaultValue.type] || '信息'" :style="{ border: 0 }">
               <a-tabs default-active-key="1" v-show="defaultValue.type == '1'">
                 <a-tab-pane key="1" tab="请求参数" force-render>
                   <div class="ds_form_item" v-for="(element, index) in dataSourceJson('paramJson')" :key="index">
                     <div class="ds_form_item_content">
-                      <a-input size="small" disabled placeholder="name" v-model="element.name" style="width:150px" />
+                      <a-input disabled placeholder="name" v-model="element.name" style="width:150px" />
                       <div> </div>
                       <div style="width:300px;flex-shrink: 0;">
-                        <a-switch size="small" disabled v-model="element.value" v-if="element.valueType == '1'" />
-                        <a-input size="small" disabled v-model="element.value" v-else-if="element.valueType == '2'"
+                        <a-switch disabled v-model="element.value" v-if="element.valueType == '1'" />
+                        <a-input disabled v-model="element.value" v-else-if="element.valueType == '2'"
                           placeholder="请输入表达式（示例：@[data.value]）" style="width:100%" />
-                        <a-input size="small" disabled v-model="element.value" v-else placeholder="请输入字符串"
-                          style="width:100%" />
+                        <a-input disabled v-model="element.value" v-else placeholder="请输入字符串" style="width:100%" />
                       </div>
-                      <a-select :getPopupContainer="getPopupContainer" size="small" disabled style="width:100px"
-                        allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
+                      <a-select :getPopupContainer="getPopupContainer" disabled style="width:100px" allowClear
+                        dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
                         <a-select-option :value="0">字符串</a-select-option>
                         <a-select-option :value="1">布尔</a-select-option>
                         <a-select-option :value="2">表达式</a-select-option>
@@ -181,17 +162,16 @@
                 <a-tab-pane key="2" tab="请求头信息" force-render>
                   <div class="ds_form_item" v-for="(element, index) in dataSourceJson('headerJson')" :key="index">
                     <div class="ds_form_item_content">
-                      <a-input size="small" disabled placeholder="name" v-model="element.name" style="width:150px" />
+                      <a-input disabled placeholder="name" v-model="element.name" style="width:150px" />
                       <div> </div>
                       <div style="width:300px;flex-shrink: 0;">
-                        <a-switch size="small" disabled v-model="element.value" v-if="element.valueType == '1'" />
-                        <a-input size="small" disabled v-model="element.value" v-else-if="element.valueType == '2'"
+                        <a-switch disabled v-model="element.value" v-if="element.valueType == '1'" />
+                        <a-input disabled v-model="element.value" v-else-if="element.valueType == '2'"
                           placeholder="请输入表达式（示例：@[data.value]）" style="width:100%" />
-                        <a-input size="small" disabled v-model="element.value" v-else placeholder="请输入字符串"
-                          style="width:100%" />
+                        <a-input disabled v-model="element.value" v-else placeholder="请输入字符串" style="width:100%" />
                       </div>
-                      <a-select :getPopupContainer="getPopupContainer" size="small" disabled style="width:100px"
-                        allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
+                      <a-select :getPopupContainer="getPopupContainer" disabled style="width:100px" allowClear
+                        dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
                         <a-select-option :value="0">字符串</a-select-option>
                         <a-select-option :value="1">布尔</a-select-option>
                         <a-select-option :value="2">表达式</a-select-option>
@@ -211,7 +191,7 @@
                     <a-icon type="question-circle-o" />
                   </a-tooltip>
                 </span>
-                <a-input size="small" placeholder="请输入" @change="needTest = true" v-decorator="[
+                <a-input placeholder="请输入" @change="needTest = true" v-decorator="[
                   'api',
                   {
                     initialValue: defaultValue.api,
@@ -221,7 +201,7 @@
               </a-form-item>
               <a-form-item label='请求方式' v-if="defaultValue.type == '4'" :label-col="formItemLayoutBottom.labelCol"
                 :wrapper-col="formItemLayoutBottom.wrapperCol">
-                <a-radio-group size="small" @change="needTest = true" v-decorator="['requestType',
+                <a-radio-group @change="needTest = true" v-decorator="['requestType',
                 {
                   initialValue: defaultValue.requestType,
                   rules: [{ required: true, message: '请选择请求方式!' }],
@@ -242,10 +222,10 @@
                     <a-icon type="question-circle-o" />
                   </a-tooltip>
                 </span>
-                <a-input-number size="small" placeholder="请输入"
-                  v-decorator="['timeout', { initialValue: defaultValue.timeout || 0 }]" :min="0" :max="10000000" />
+                <a-input-number placeholder="请输入" v-decorator="['timeout', { initialValue: defaultValue.timeout || 0 }]"
+                  :min="0" :max="10000000" />
               </a-form-item>
-              <a-form-item v-if="defaultValue.type == '4' || defaultValue.type == '2' || defaultValue.type == '1'"
+              <a-form-item v-if="defaultValue.type == '4' || defaultValue.type == '2'"
                 :label-col="defaultValue.type == '4' ? formItemLayoutBottom.labelCol : defaultValue.type == '2' ? formItemLayout.labelCol : 0"
                 :wrapper-col="defaultValue.type == '4' ? formItemLayoutBottom.wrapperCol : defaultValue.type == '2' ? formItemLayout.wrapperCol : 0">
                 <span slot="label">
@@ -255,7 +235,7 @@
                     <a-icon type="question-circle-o" />
                   </a-tooltip>
                 </span>
-                <a-input size="small" style="display:none" v-decorator="[
+                <a-input style="display:none" v-decorator="[
                   'paramJson',
                   {
                     initialValue: defaultValue.paramJson,
@@ -271,21 +251,18 @@
                         <svg-icon icon-class="listdrag-icon" class="handle" />
                       </div>
                       <div class="ds_form_item_content">
-                        <a-input size="small" @change="paramChange()" placeholder="name" v-model="element.name"
+                        <a-input @change="paramChange()" placeholder="name" v-model="element.name"
                           :style="defaultValue.type == '1' ? 'width: 126px' : 'width:90px'" />
                         <div>:</div>
                         <div :style="{ 'flex-shrink': 0, width: defaultValue.type == '1' ? '297px' : '130px' }">
-                          <a-switch size="small" @change="paramChange()" v-model="element.value"
-                            v-if="element.valueType == '1'" />
-                          <a-input size="small" @change="paramChange()" v-model="element.value"
-                            v-else-if="element.valueType == '2'" placeholder="请输入表达式（示例：@[data.value]）"
+                          <a-switch @change="paramChange()" v-model="element.value" v-if="element.valueType == '1'" />
+                          <a-input @change="paramChange()" v-model="element.value" v-else-if="element.valueType == '2'"
+                            placeholder="请输入表达式（示例：@[data.value]）" style="width:100%" />
+                          <a-input @change="paramChange()" v-model="element.value" v-else placeholder="请输入字符串"
                             style="width:100%" />
-                          <a-input size="small" @change="paramChange()" v-model="element.value" v-else
-                            placeholder="请输入字符串" style="width:100%" />
                         </div>
-                        <a-select :getPopupContainer="getPopupContainer" size="small" @change="paramChange()"
-                          style="width:100px" allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType"
-                          :default-value="0">
+                        <a-select :getPopupContainer="getPopupContainer" @change="paramChange()" style="width:100px"
+                          allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
                           <a-select-option :value="0">字符串</a-select-option>
                           <a-select-option :value="1">布尔</a-select-option>
                           <a-select-option :value="2">表达式</a-select-option>
@@ -298,7 +275,7 @@
                   </transition-group>
                 </draggable>
                 <div>
-                  <a-button size="small" icon="plus" @click="pushNewRow('paramJson')">添加</a-button>
+                  <a-button icon="plus" @click="pushNewRow('paramJson')">添加</a-button>
                 </div>
               </a-form-item>
               <a-form-item v-if="defaultValue.type == '4'" :label-col="formItemLayoutBottom.labelCol"
@@ -326,18 +303,17 @@
                         <svg-icon icon-class="listdrag-icon" class="handle" />
                       </div>
                       <div class="ds_form_item_content">
-                        <a-input size="small" placeholder="name" v-model="element.name" style="width:90px" />
+                        <a-input placeholder="name" v-model="element.name" style="width:90px" />
                         <div>:</div>
                         <div style="width:130px;flex-shrink: 0;">
-                          <a-switch size="small" @change="needTest = true" v-model="element.value"
-                            v-if="element.valueType == '1'" />
-                          <a-input size="small" @change="needTest = true" v-model="element.value"
+                          <a-switch @change="needTest = true" v-model="element.value" v-if="element.valueType == '1'" />
+                          <a-input @change="needTest = true" v-model="element.value"
                             v-else-if="element.valueType == '2'" placeholder="请输入表达式（示例：@[data.value]）"
                             style="width:100%" />
                           <a-input @change="needTest = true" v-model="element.value" v-else placeholder="请输入字符串"
                             style="width:100%" />
                         </div>
-                        <a-select :getPopupContainer="getPopupContainer" size="small" style="width:100px" allowClear
+                        <a-select :getPopupContainer="getPopupContainer" style="width:100px" allowClear
                           dropdownClassName="idm_dev_theme" @change="needTest = true" v-model="element.valueType"
                           :default-value="0">
                           <a-select-option :value="0">字符串</a-select-option>
@@ -352,7 +328,7 @@
                   </transition-group>
                 </draggable>
                 <div>
-                  <a-button size="small" icon="plus" @click="pushNewRow('headerJson')">添加</a-button>
+                  <a-button icon="plus" @click="pushNewRow('headerJson')">添加</a-button>
                 </div>
 
               </a-form-item>
@@ -364,7 +340,7 @@
                     <a-icon type="question-circle-o" />
                   </a-tooltip>
                 </span>
-                <a-input placeholder="请输入" @change="needTest = true" size="small" v-decorator="[
+                <a-input placeholder="请输入" @change="needTest = true" v-decorator="[
                   'dbName',
                   {
                     initialValue: defaultValue.dbName,
@@ -412,7 +388,59 @@
                   </div>
                 </a-upload>
               </a-form-item>
-
+            </a-collapse-panel>
+            <a-collapse-panel v-if="isShowBottomCollapse" key="3" forceRender>
+              <template #header>
+                请求参数
+                <a-tooltip :getPopupContainer="getPopupContainer"
+                  :title="((defaultValue.dataSource && defaultValue.dataSource.type == '2') ? '请根据SQL语句中的问号数量按需填写参数，否则将执行失败，请注意参数的顺序。' : '请求地址所需要的参数，支持IDM表达式的方式。') + '例如：此处填写(举例url中有abc=123的参数) @[url(\'abc\')+\'---\'+abc]，组件传递了 {abc:4567} ，则这里替换后则为 123---4567'">
+                  <a-icon type="question-circle-o" />
+                </a-tooltip>
+              </template>
+              <a-form-item label="" :colon="false" :label-col="0" :wrapper-col="0">
+                <a-input style="display:none" v-decorator="[
+                  'paramJson',
+                  {
+                    initialValue: defaultValue.paramJson,
+                  }
+                ]" />
+                <!--propName：paramJson-->
+                <draggable tag="div" chosen-class="idmcore-datasource-param-ghost" force-fallback="true" animation="300"
+                  v-model="paramJson" group="param" @start="paramSelectDrag = true" @end="paramSelectDrag = false;"
+                  handle=".handle">
+                  <transition-group>
+                    <div class="ds_form_item" v-for="(element, index) in paramJson" :key="index">
+                      <div class="ds_form_item_handle">
+                        <svg-icon icon-class="listdrag-icon" class="handle" />
+                      </div>
+                      <div class="ds_form_item_content">
+                        <a-input @change="paramChange()" placeholder="name" v-model="element.name"
+                          style="width: 126px" />
+                        <div>:</div>
+                        <div :style="{ 'flex-shrink': 0, width: '297px' }">
+                          <a-switch @change="paramChange()" v-model="element.value" v-if="element.valueType == '1'" />
+                          <a-input @change="paramChange()" v-model="element.value" v-else-if="element.valueType == '2'"
+                            placeholder="请输入表达式（示例：@[data.value]）" style="width:100%" />
+                          <a-input @change="paramChange()" v-model="element.value" v-else placeholder="请输入字符串"
+                            style="width:100%" />
+                        </div>
+                        <a-select :getPopupContainer="getPopupContainer" @change="paramChange()" style="width:100px"
+                          allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
+                          <a-select-option :value="0">字符串</a-select-option>
+                          <a-select-option :value="1">布尔</a-select-option>
+                          <a-select-option :value="2">表达式</a-select-option>
+                        </a-select>
+                        <div @click="deleteListRow('paramJson', index)">
+                          <svg-icon icon-class="delete-icon" />
+                        </div>
+                      </div>
+                    </div>
+                  </transition-group>
+                </draggable>
+                <div>
+                  <a-button icon="plus" @click="pushNewRow('paramJson')">添加参数</a-button>
+                </div>
+              </a-form-item>
             </a-collapse-panel>
           </a-collapse>
         </a-form>
@@ -462,9 +490,8 @@ export default {
       subLabelMap,
       currentStep: 0,
       paramEdit: false,
-      activeCollapse: ['1', '2'],
+      activeCollapse: ['1', '2', '3'],
       intelfaceDebugVisible: false,
-      tagsList: ["{}", "[]", "[{}]"],
       paramJson: [],
       headerJson: [],
       fileList: [],
@@ -515,10 +542,6 @@ export default {
     ConditionProductList: {
       type: Array,
       default: () => []
-    },
-    dataModelType: {
-      type: Array,
-      default: () => []
     }
   },
   beforeCreate() {
@@ -549,9 +572,6 @@ export default {
     }
     if (!this.form.getFieldValue("productArray")) {
       this.form.setFieldsValue({ "productArray": [] })
-    }
-    if (!this.form.getFieldValue("tags")) {
-      this.form.setFieldsValue({ "tags": [] })
     }
     if (!this.form.getFieldValue("api")) {
       this.form.setFieldsValue({ "api": "" })
@@ -584,7 +604,7 @@ export default {
   },
   computed: {
     drawerTitle() {
-      return this.dataModelType.find(el => el.value == this.defaultValue.type)?.label || ''
+      return this.ConditionType.find(el => el.value == this.defaultValue.type)?.text || '模型信息'
     },
     steps() {
       const showStep = _.cloneDeep(steps)
@@ -604,13 +624,21 @@ export default {
       }
       return false
     },
-    isShowBottomCollapse() {
+    isShowSecondCollapse() {
       if (this.defaultValue.type == '1') {
         if ([2, 3, 5].includes(this.defaultValue?.dataSource?.type)) {
           return false
         }
       }
       return true
+    },
+    isShowBottomCollapse() {
+      if (this.defaultValue.type == '1') {
+        if ([1, 4].includes(this.defaultValue?.dataSource?.type)) {
+          return true
+        }
+      }
+      return false
     },
     isShowNextBtn() {
       // excel 只有两步
@@ -649,7 +677,7 @@ export default {
   destroyed() { },
   methods: {
     getPopupContainer() {
-      return this.$refs['dmDrawer'].$el.getElementsByClassName('ant-drawer-content-wrapper')[0]
+      return document.getElementsByClassName('ant-drawer-content-wrapper')[0]
     },
     dataSourceJson(paramJson) {
       let arr = []
@@ -907,7 +935,7 @@ export default {
     visible: {
       handler(newV) {
         if (newV) {
-          this.activeCollapse = ['1', '2']
+          this.activeCollapse = ['1', '2', '3']
           this.currentStep = 0
           this.isShowProgress = false
         }
@@ -916,7 +944,7 @@ export default {
     defaultValue: {
       handler(newV) {
         console.log(newV)
-        //type   title   shareType   author   remark   groupId   tags   api   requestType    dbName   dbSql   file_name
+        //type   title   shareType   author   remark   groupId   api   requestType    dbName   dbSql   file_name
         const productArray = []
         if (newV.productIds) {
           let productids = newV.productIds.split(","), productnames = newV.productNames.split(",");
@@ -934,7 +962,6 @@ export default {
             "groupId": newV.groupId || "",
             "shareType": newV.shareType || 1,
             "productArray": productArray,
-            "tags": newV.tags || [],
             "api": newV.api || "",
             "requestType": newV.requestType || "GET",
             "timeout": newV.timeout || 0,
