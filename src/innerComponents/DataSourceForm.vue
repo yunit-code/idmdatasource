@@ -561,6 +561,44 @@
                       </div>
         </a-form-item>
 
+        <a-form-item
+          :label-col="formItemLayout.labelCol"
+          :wrapper-col="formItemLayout.wrapperCol"
+        v-show="form.getFieldValue('type')=='6'">
+          <span slot="label">
+            数据模型
+            <a-tooltip title="可直接选择数据模型中缓存下拉的数据作为数据使用，无需传任何参数。">
+              <a-icon type="question-circle-o" />
+            </a-tooltip>
+          </span>
+        <a-input
+          style="display:none"
+            v-decorator="[
+              'datamodelId',
+              {
+                initialValue:defaultValue.datamodelId,
+              }
+            ]"
+          />
+        <a-input
+          style="display:none"
+            v-decorator="[
+              'datamodelName',
+              {
+                initialValue:defaultValue.datamodelName,
+              }
+            ]"
+          />
+          <!--propName：datamodelId-->
+          <div class="idm-datamodel-selbox">
+            <a-tag v-if="form.getFieldValue('datamodelName')">
+              {{form.getFieldValue('datamodelName')}}
+            </a-tag>
+            <a-tag @click="addModelClick" style="borderStyle: dashed;">
+              <a-icon type="plus" /> {{form.getFieldValue('datamodelName')?"重新":""}}选择
+            </a-tag>
+          </div>
+        </a-form-item>
         <a-form-item  :label="form.getFieldValue('type')=='3'?'JSON文件':'CSV文件'"
           v-if="form.getFieldValue('type')=='3'||form.getFieldValue('type')=='5'"
           :label-col="formItemLayout.labelCol"
@@ -620,7 +658,7 @@
                 }
               ]"
             />
-          <div class="monacoeditor-box-title">{{form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4'?"请求成功对结果的处理函数":"结果处理函数"}}
+          <div class="monacoeditor-box-title">{{form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4'||form.getFieldValue('type')=='6'?"请求成功对结果的处理函数":"结果处理函数"}}
             <a-tooltip title="处理函数如果执行失败将起不到任何效果">
               <a-icon type="question-circle-o" />
             </a-tooltip><a @click="customFunctionVisible.two=!customFunctionVisible.two" style="margin-left:20px">{{customFunctionVisible.two?'折叠':'展开'}}</a></div>
@@ -651,12 +689,12 @@
                 }
               ]"
             />
-          <div class="monacoeditor-box-title" v-if="form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4'">请求失败对异常的处理函数
+          <div class="monacoeditor-box-title" v-if="form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4'||form.getFieldValue('type')=='6'">请求失败对异常的处理函数
             <a-tooltip title="处理函数如果执行失败将起不到任何效果">
               <a-icon type="question-circle-o" />
             </a-tooltip><a @click="customFunctionVisible.three=!customFunctionVisible.three" style="margin-left:20px">{{customFunctionVisible.three?'折叠':'展开'}}</a></div>
           <div class="monacoeditor-box"
-          v-if="(form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4')&&customFunctionVisible.three" style="height:200px;">
+          v-if="(form.getFieldValue('type')=='1'||form.getFieldValue('type')=='4'||form.getFieldValue('type')=='6')&&customFunctionVisible.three" style="height:200px;">
             <MonacoEditor
                         ref="resultJavascriptError"
                         :language="`javascript`"
@@ -775,6 +813,58 @@
           </div>
         </div>
       </a-modal>
+      <a-modal  
+      wrapClassName="idm_dm_data_source_select"
+        :centered="true"
+        :bodyStyle="{ 'padding': 0 }"
+        width="700px"
+        v-model="dataModelSelectVisible" title="数据模型选择"
+        :footer="null"
+        destroyOnClose>
+            <!--检索条件-->
+            <div class="idm-page-select-search">
+              <a-select default-value="" v-model="conditionValue.TYPE" style="width: 100px" allowClear dropdownClassName="idm_dev_theme" @change="handleChange">
+                <a-select-option v-for="(item,index) in DataModelConditionType" :key="index" :value="item.value">
+                  {{item.text}}
+                </a-select-option>
+              </a-select>
+              <a-select default-value="" v-model="conditionValue.GROUP_ID" style="width: 150px" allowClear dropdownClassName="idm_dev_theme" @change="handleChange">
+                <a-select-option v-for="(item,index) in DataModelConditionGroup" :key="index" :value="item.value">
+                  {{item.text}}
+                </a-select-option>
+              </a-select>
+              <a-input-search placeholder="请输入关键词" v-model="conditionValue.searchText" style="width: 200px" @search="handleChange" />
+            </div>
+            <!--内容-->
+            <div class="idm-page-select-content scrollbar_style" @scroll="scrollHandle">
+              <div class="idm-page-select-content-item" @click="selectDataModel(item)" v-for="(item,index) in resultList" :key="index" >
+                <div class="idm-psc-item-inner" :class="{'active':hasCheck(item)}">
+                  <div>
+                    <div class="idm-psc-item-inner-title">
+                      <label>{{item.title}}</label>
+                      <a-tag :color="tagColorArray[item.type]">
+                        {{ DataModelConditionType.filter((sitem) => sitem.value == item.type).length?DataModelConditionType.filter((sitem) => sitem.value == item.type)[0].text:"" }}
+                      </a-tag>
+                      <a-tag color="blue">
+                        {{ DataModelConditionGroup.filter((sitem) => sitem.value == item.groupId).length?DataModelConditionGroup.filter((sitem) => sitem.value == item.groupId)[0].text:"" }}
+                      </a-tag>
+                      <a-tag>
+                        {{item.shareType=="0"?"私有":"共享"}}
+                      </a-tag>
+                    </div>
+                    <div class="idm-psc-item-inner-desc" style="height:auto;max-height:46px">
+                      {{item.remark}}
+                    </div>
+                  </div>
+                  <svg-icon icon-class="rb-select-icon" class="rb-select-icon"/>
+                </div>
+              </div>
+              <div class="idm-page-select-content-loading" style="text-align: center;padding:20px 0px;">
+                <a-spin v-if="loading"></a-spin>
+                {{loadEnd?resultList.length==0?"暂无数据":"没有更多了":""}}
+              </div>
+            </div>
+      </a-modal>
     </a-modal>
 </template>
 
@@ -791,6 +881,7 @@ export default {
         paramEdit:false,
         moduleIntelfaceVisible:false,
         intelfaceDebugVisible:false,
+        dataModelSelectVisible:false,
         tagsList:["{}","[]","[{}]"],
         paramJson:[],
         headerJson:[],
@@ -804,6 +895,29 @@ export default {
         paramJson_debug:[],
         headerJson_debug:[],
         testLoading:false,
+
+        tagColorArray:["","#108ee9","#fdc500","#2dd300","#4250ff"],
+        DataModelConditionType: IDM.setting.develop.dataModelConditionType instanceof Array
+            ? [{ text: "全部", value: "" }].concat(
+                IDM.setting.develop.dataModelConditionType
+              )
+            : [],
+        DataModelConditionGroup:IDM.setting.develop.dataModelConditionGroup instanceof Array
+            ? [{ text: "全部", value: "" }].concat(
+                IDM.setting.develop.dataModelConditionGroup
+              )
+            : [],
+        resultList: [],
+        totalCount:0,
+        conditionValue:{
+          pageIndex:1,
+          pageSize:10,
+          TYPE:"",
+          GROUP_ID:"",
+          searchText:""
+        },
+        loading:false,
+        loadEnd:false,
       }
   },
   props: {
@@ -847,6 +961,9 @@ export default {
     }
     if(!this.form.getFieldValue("groupId")){
       this.form.setFieldsValue({"groupId":""})
+    }
+    if(!this.form.getFieldValue("datamodelId")){
+      this.form.setFieldsValue({"datamodelId":""})
     }
     if(!this.form.getFieldValue("title")){
       this.form.setFieldsValue({"title":""})
@@ -901,6 +1018,44 @@ export default {
     }
   },
   created() {
+
+    let that = this;
+    //数据源分组
+    if (
+      !IDM.develop.cacheData.DataModelConditionGroupList &&
+      IDM.type(IDM.setting.develop.dataModelConditionGroup) == "string"
+    ) {
+      IDM.http.get(IDM.setting.develop.dataModelConditionGroup).then((res) => {
+        let resultData = [{ text: "全部", value: "" }];
+        if (res.data.code == 200) {
+          resultData = resultData.concat(res.data.data);
+        }
+        IDM.develop.cacheData.DataModelConditionGroupList = resultData;
+        that.DataModelConditionGroup = resultData;
+      });
+    } else if (
+      IDM.type(IDM.setting.develop.dataModelConditionGroup) == "string"
+    ) {
+      this.DataModelConditionGroup = IDM.develop.cacheData.DataModelConditionGroupList;
+    }
+    //类型分组
+    if (
+      !IDM.develop.cacheData.DataModelConditionTypeList &&
+      IDM.type(IDM.setting.develop.dataModelConditionType) == "string"
+    ) {
+      IDM.http.get(IDM.setting.develop.dataModelConditionType).then((res) => {
+        let resultData = [{ text: "全部", value: "" }];
+        if (res.data.code == 200) {
+          resultData = resultData.concat(res.data.data);
+        }
+        IDM.develop.cacheData.DataModelConditionTypeList = resultData;
+        that.DataModelConditionType = resultData;
+      });
+    } else if (
+      IDM.type(IDM.setting.develop.dataModelConditionType) == "string"
+    ) {
+      this.DataModelConditionType = IDM.develop.cacheData.DataModelConditionTypeList;
+    }
   },
   activated() {
   },
@@ -917,6 +1072,83 @@ export default {
   },
   destroyed() {},
   methods:{
+    scrollHandle(e){
+      // console.log("gundong",e.target);
+      if(e.target.scrollHeight-e.target.scrollTop-e.target.clientHeight<=100){
+        if(!this.loading&&!this.loadEnd){
+          this.conditionValue.pageIndex=this.conditionValue.pageIndex+1;
+          this.loadData();
+        }
+      }
+    },
+    addModelClick(){
+      if(this.conditionValue.pageIndex==1){
+        this.handleChange();
+      }
+      this.dataModelSelectVisible = true;
+    },
+    //检索条件改变时候触发
+    handleChange(){
+      this.conditionValue.pageIndex = 1;
+      this.loadEnd = false;
+      this.loadData(true);
+    },
+
+    loadData(isreload){
+      let that = this;
+      if((!IDM.setting.api.dataModelFetchListApi&&!IDM.setting.mockurl.dataModelFetchListApi)||that.loading){
+        return
+      }
+      if(isreload){
+        that.resultList=[];
+      }
+      that.loading = true;
+      let param = {
+        pageIndex:this.conditionValue.pageIndex,
+        pageSize:this.conditionValue.pageSize,
+        searchText:this.conditionValue.searchText
+      };
+      if(this.conditionValue.TYPE){
+        param["TYPE"] = this.conditionValue.TYPE
+      }
+      if(this.conditionValue.GROUP_ID){
+        param["GROUP_ID"] = this.conditionValue.GROUP_ID
+      }
+      IDM.http.get(IDM.setting.api.dataModelFetchListApi||IDM.setting.mockurl.dataModelFetchListApi,param).then(res=>{
+        if(res&&res.data&&res.data.code=="200"&&res.data.data&&res.data.data.rows){
+          if(res.data.data.rows.length<that.conditionValue.pageSize){
+            that.loadEnd = true;
+          }
+          that.resultList = that.resultList.concat(res.data.data.rows);
+          that.totalCount = res.data.data.total;
+        }
+        that.loading = false;
+      }).catch(err=>{
+        IDM.message.error(err.message)
+        that.loading = false;
+      })
+    },
+    hasCheck(pitem){
+      let hasExists = false;
+      let thisValue = this.form.getFieldValue("datamodelId");
+      if(!thisValue){
+        return hasExists;
+      }
+      if(!(thisValue instanceof Array)){
+        thisValue = [thisValue];
+      }
+      if (
+          thisValue==pitem.id
+        ) {
+          hasExists = true;
+        }
+      return hasExists;
+    },
+    selectDataModel(item){
+      this.form.setFieldsValue({datamodelId:item.id,datamodelName:item.title});
+      this.dataModelSelectVisible = false;
+    },
+
     debugDataSourceTest(){
       let that = this;
       var dataSourceObject = this.form.getFieldsValue();
@@ -1189,6 +1421,8 @@ export default {
           "author":this.defaultValue.author||"",
           "remark":this.defaultValue.remark||"",
           "groupId":this.defaultValue.groupId||"",
+          "datamodelId":this.defaultValue.datamodelId||"",
+          "datamodelName":this.defaultValue.datamodelName||"",
           "shareType":this.defaultValue.shareType||"1",
           "loadType":this.defaultValue.loadType||"0",
           "moduleArray":this.defaultValue.moduleArray||[],
