@@ -194,14 +194,14 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .idm-page-select-search {
     display: flex;
     padding-top: 12px;
     margin: 0 16px;
 
     &>* {
-        margin-right: 10px;
+        margin-right: 10px !important;
     }
 }
 

@@ -272,6 +272,17 @@
                 </a-descriptions-item>
               </a-descriptions>
             </div>
+            <!--数据模型-->
+            <div v-else-if="record.type=='6'">
+              <a-descriptions bordered size="small" :column="1">
+                <a-descriptions-item label="数据模型">
+                  {{record.datamodelName}}
+                </a-descriptions-item>
+                <a-descriptions-item label="调试结果" >
+                  {{record.debugResult}}
+                </a-descriptions-item>
+              </a-descriptions>
+            </div>
             
           </div>
         </div>
