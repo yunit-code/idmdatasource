@@ -28,7 +28,6 @@
             v-if="isShowCompleteBtn">
             完成
           </a-button>
-
         </div>
       </div>
       <div style="height:calc(100vh - 215px);overflow: auto;padding: 0 10px" class="scrollbar_style">
@@ -762,10 +761,10 @@ export default {
       this.percent = 1
       this.progressStatus = 'active'
       apis.requestAnalysisJson(this.handleGetParams()).then(res => {
-        if (res.status == 200 && res.data.code == 200 && Array.isArray(res.data.data)) {
+        if (res.status == 200 && res.data.code == 200) {
           IDM.message.success(res.data.message)
           this.progressStatus = 'success'
-          this.$refs['dataModelResultParse'].setTableData(res.data.data)
+          this.$refs['dataModelResultParse'].setTableData(res.data.data || [])
           this.needTest = false
         } else {
           IDM.message.error(res?.data?.message || '测试失败')
