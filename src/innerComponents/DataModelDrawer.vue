@@ -1,7 +1,7 @@
 <template>
-  <a-drawer :visible="visible" :zIndex="1005" destroyOnClose ref="dmDrawer" :maskClosable="false"
-    wrapClassName="idm_dm_drawer" :body-style="{ padding: '24px 0 80px 0' }" width="750px"
-    :title="drawerTitle || '数据源建模'" @close="() => $emit('change', false)">
+  <a-drawer :visible="visible" :zIndex="1005" ref="dmDrawer" :maskClosable="false" wrapClassName="idm_dm_drawer"
+    :body-style="{ padding: '24px 0 80px 0' }" width="750px" :title="drawerTitle || '数据源建模'"
+    @close="() => $emit('change', false)">
     <a-spin :spinning="spinning">
       <div class="step-container" :style="{ 'padding': `0 ${steps.length == 3 ? 40 : 120}px` }">
         <a-steps :current="currentStep" size="small" labelPlacement="vertical">
@@ -379,12 +379,10 @@
                       rules: [{ required: true, message: '请上传附件!' }],
                     },
                   ]">
-                  <div v-if="fileList.length < 1">
-                    <a-button>
-                      <a-icon type="upload" /> 点击上传
-                    </a-button>
-                    <span style="color:999;font-size: 12px;margin: 10px 0 0 10px;">支持.xlsx,.xls格式</span>
-                  </div>
+                  <a-button>
+                    <a-icon type="upload" /> 点击上传
+                  </a-button>
+                  <span style="color:999;font-size: 12px;margin: 10px 0 0 10px;">支持.xlsx,.xls格式</span>
                 </a-upload>
               </a-form-item>
             </a-collapse-panel>
@@ -594,9 +592,8 @@ export default {
       this.form.setFieldsValue({ "dbSql": "SELECT" })
     }
     if (!this.form.getFieldValue("file_name")) {
-      this.form.setFieldsValue({ "file_name": '' })
+      this.form.setFieldsValue({ "file_name": [] })
     }
-
     if (this.defaultValue.type == '2') {
       this.sqlEditorLoaded(true);
     }
@@ -714,6 +711,7 @@ export default {
           // 第一步表单
           this.form.validateFields((err, values) => {
             if (!err) {
+              this.completeBtnLoading = false
               this.currentStep++
             }
           });
@@ -722,6 +720,7 @@ export default {
           if (this.defaultValue.type == 3) {
             this.handleComplete()
           } else {
+            this.completeBtnLoading = false
             this.currentStep++
           }
           break
@@ -885,10 +884,8 @@ export default {
         status: 'uploading',
         // url: IDM.url.getWebPath(resultData.filePath),
       }
-      let selectedList = _.cloneDeep(this.form.getFieldValue(formKey)) || [];
-      if (selectedList instanceof Array) {
-        selectedList.push(newObject);
-      }
+      let selectedList = [];
+      selectedList.push(newObject);
       that.changeSetFormValue(formKey, selectedList);
       let customParam = { ...IDM.setting.webRoot, getFileContent: 1 };
       IDM.http.upload(IDM.setting.api.uploadFileServerUrl, file.file, customParam).then(res => {
@@ -985,6 +982,7 @@ export default {
           if (newV.isEditInfo) {
             this.$refs['dataModelResultParse']?.setDefaultValue(newV)
             this.$refs['dataModelUpdateSetting']?.setDefaultValue(newV)
+            // 不用测试
             setTimeout(() => {
               this.needTest = false
             }, 500)
