@@ -19,7 +19,16 @@
             "type": "group",
             "text": "基本属性",
             "desc": "提供设置组件能达到展示效果的基本属性设置信息",
-            "children": []
+            "children": [
+                {
+                    "type": "input",
+                    "layoutType": "inline",
+                    "text": "参数保留",
+                    "bindKey": "conditionRetainArray",
+                    "desc":"用于保留搜索条件而不被清空，此处适合如果条件为空也会接收消息的情况",
+                    "default": ""
+                }
+            ]
         },
         {
             "type": "group",

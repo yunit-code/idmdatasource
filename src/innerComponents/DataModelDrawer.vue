@@ -100,6 +100,20 @@
                   </template>
                 </a-select>
               </a-form-item>
+              <a-form-item label='所属目录'
+                :label-col="formItemLayout.labelCol"
+                :wrapper-col="formItemLayout.wrapperCol">
+                <a-tree-select allowClear
+                :tree-data="CodeTreeData"
+                :showSearch="true"
+                treeNodeFilterProp="title"
+              dropdownClassName="idm_dev_theme" :replaceFields="{children:'children', title:'name', key:'id', value: 'id' }" v-decorator="['codeId',
+                    {
+                      initialValue:defaultValue.codeId,
+                      rules: [{ required: true, message: '请选择所属目录!' }],
+                    }]">
+                </a-tree-select>
+              </a-form-item>
               <a-form-item :label-col="formItemLayout.labelCol" :wrapper-col="formItemLayout.wrapperCol">
                 <span slot="label">
                   产品标签
@@ -510,6 +524,7 @@ export default {
       progressStatus: 'active',
       isShowProgress: false,
       needTest: true,
+      CodeTreeData:[],
     }
   },
   model: {
@@ -545,6 +560,22 @@ export default {
     this.form = this.$form.createForm(this, { name: 'form_in_modal_ds' });
   },
   created() {
+    let that = this;
+    //所属目录
+    if (
+      !IDM.develop.cacheData.DataModelDirectoryTree
+    ) {
+      IDM.http.get("ctrl/idm/code/getCodeTree?codeIds=221129152417rZZZVoEfzket0xgX47s").then((res) => {
+        let resultData = [];
+        if (res.data.code == 200) {
+          resultData = res.data.data.codeList;
+        }
+        IDM.develop.cacheData.DataModelDirectoryTree = resultData;
+        that.CodeTreeData = resultData;
+      });
+    } else {
+      this.CodeTreeData = IDM.develop.cacheData.DataModelDirectoryTree;
+    }
   },
   activated() {
   },
@@ -560,6 +591,9 @@ export default {
     }
     if (!this.form.getFieldValue("groupId")) {
       this.form.setFieldsValue({ "groupId": "" })
+    }
+    if (!this.form.getFieldValue("codeId")) {
+      this.form.setFieldsValue({ "codeId": "" })
     }
     if (!this.form.getFieldValue("title")) {
       this.form.setFieldsValue({ "title": "" })
@@ -956,6 +990,7 @@ export default {
             "author": newV.author || "",
             "remark": newV.remark || "",
             "groupId": newV.groupId || "",
+            "codeId": newV.codeId || "",
             "shareType": newV.shareType || 1,
             "productArray": productArray,
             "api": newV.api || "",

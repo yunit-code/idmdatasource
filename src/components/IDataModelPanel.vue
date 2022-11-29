@@ -246,6 +246,8 @@ export default {
   },
   data() {
     return {
+      conditionObject:{},
+      conditionObjectRetain:{},
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {},
       loading: false,
@@ -494,6 +496,18 @@ export default {
     change() {
       this.reload(true);
     },
+    onReInitData(conditionObject){
+      this.conditionObject = conditionObject||this.conditionObject||{};
+      this.reload(true);
+    },
+    onReInitDataMsgKey(conditionObject,messageKey){
+      if(this.propData.conditionRetainArray&&this.propData.conditionRetainArray.split(",").indexOf(messageKey)>-1){
+        this.conditionObjectRetain[messageKey] = conditionObject;
+      }else{
+        this.conditionObject[messageKey] = conditionObject;
+      }
+      this.reload(true);
+    },
     // 分页改变
     changePage(pagination) {
       if (pagination && pagination.current) {
@@ -555,6 +569,12 @@ export default {
         });
         params.PRODUCT_IDS = JSON.stringify(PRODUCT_IDS);
       }
+      this.conditionObject&&Object.keys(this.conditionObject).forEach(key=>{
+        params[key] = typeof this.conditionObject[key]=='object'?JSON.stringify(this.conditionObject[key]):this.conditionObject[key];
+      })
+      this.conditionObjectRetain&&Object.keys(this.conditionObjectRetain).forEach(key=>{
+        params[key] = typeof this.conditionObjectRetain[key]=='object'?JSON.stringify(this.conditionObjectRetain[key]):this.conditionObjectRetain[key];
+      })
       params["pageIndex"] = this.current;
       params["pageSize"] = this.pageSize;
       apis.requestModelList(params).then((res) => {
@@ -583,7 +603,15 @@ export default {
     },
     receiveBroadcastMessage(object) {
       console.log("组件收到消息", object)
-      if (object.type && object.type == "linkageShowModule") {
+      if(object.type&&object.type=="linkageDemand"){
+        if(object.messageKey){
+          this.onReInitDataMsgKey(object.message,object.messageKey);
+        }else{
+          this.onReInitData(object.message);
+        }
+      }else if(object.type&&object.type=="linkageReload"){
+        this.reload(object.message&&object.message.reloadFirstPage);
+      }else if (object.type && object.type == "linkageShowModule") {
         this.showThisModuleHandle();
       } else if (object.type && object.type == "linkageHideModule") {
         this.hideThisModuleHandle();

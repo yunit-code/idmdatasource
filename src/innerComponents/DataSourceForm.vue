@@ -127,6 +127,20 @@
               </template>
           </a-select>
         </a-form-item>
+        <a-form-item label='所属目录'
+          :label-col="formItemLayout.labelCol"
+          :wrapper-col="formItemLayout.wrapperCol">
+          <a-tree-select allowClear
+          :tree-data="CodeTreeData"
+          :showSearch="true"
+          treeNodeFilterProp="title"
+        dropdownClassName="idm_dev_theme" :replaceFields="{children:'children', title:'name', key:'id', value: 'id' }" v-decorator="['codeId',
+              {
+                initialValue:defaultValue.codeId,
+                rules: [{ required: true, message: '请选择所属目录!' }],
+              }]">
+          </a-tree-select>
+        </a-form-item>
         <a-form-item 
           :label-col="formItemLayout.labelCol"
           :wrapper-col="formItemLayout.wrapperCol">
@@ -907,6 +921,9 @@ export default {
                 IDM.setting.develop.dataModelConditionGroup
               )
             : [],
+        CodeTreeData:IDM.setting.develop.dataSourceDirectoryTree instanceof Array
+            ? IDM.setting.develop.dataSourceDirectoryTree
+            : [],
         resultList: [],
         totalCount:0,
         conditionValue:{
@@ -961,6 +978,9 @@ export default {
     }
     if(!this.form.getFieldValue("groupId")){
       this.form.setFieldsValue({"groupId":""})
+    }
+    if(!this.form.getFieldValue("codeId")){
+      this.form.setFieldsValue({"codeId":""})
     }
     if(!this.form.getFieldValue("datamodelId")){
       this.form.setFieldsValue({"datamodelId":""})
@@ -1055,6 +1075,24 @@ export default {
       IDM.type(IDM.setting.develop.dataModelConditionType) == "string"
     ) {
       this.DataModelConditionType = IDM.develop.cacheData.DataModelConditionTypeList;
+    }
+    //所属目录
+    if (
+      !IDM.develop.cacheData.DataSourceDirectoryTree &&
+      IDM.type(IDM.setting.develop.dataSourceDirectoryTree) == "string"
+    ) {
+      IDM.http.get(IDM.setting.develop.dataSourceDirectoryTree).then((res) => {
+        let resultData = [];
+        if (res.data.code == 200) {
+          resultData = res.data.data.codeList;
+        }
+        IDM.develop.cacheData.DataSourceDirectoryTree = resultData;
+        that.CodeTreeData = resultData;
+      });
+    } else if (
+      IDM.type(IDM.setting.develop.dataSourceDirectoryTree) == "string"
+    ) {
+      this.CodeTreeData = IDM.develop.cacheData.DataSourceDirectoryTree;
     }
   },
   activated() {
@@ -1421,6 +1459,7 @@ export default {
           "author":this.defaultValue.author||"",
           "remark":this.defaultValue.remark||"",
           "groupId":this.defaultValue.groupId||"",
+          "codeId":this.defaultValue.codeId||"",
           "datamodelId":this.defaultValue.datamodelId||"",
           "datamodelName":this.defaultValue.datamodelName||"",
           "shareType":this.defaultValue.shareType||"1",
