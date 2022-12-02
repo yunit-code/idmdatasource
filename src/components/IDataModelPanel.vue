@@ -174,6 +174,8 @@
     <DataModelDrawer v-model="dataModalDrawerShow" ref="DataSourceForm" :visible="DataSourceFormVisible"
       :defaultValue.sync="currentData" :ConditionGroup="ConditionGroup" :ConditionType="ConditionType"
       :ConditionModuleList="ConditionModuleList" :ConditionProductList="ConditionProductList" :destroyOnClose="true"
+      :conditionObjectRetain.sync="conditionObjectRetain"
+      :conditionObject.sync="conditionObject"
       @handleComplete="handleDataModelComplete" @create="saveCustomModuleFormHandleCreate">
     </DataModelDrawer>
     <!-- 选择数据源 -->

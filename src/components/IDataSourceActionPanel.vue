@@ -296,6 +296,8 @@
       :ConditionType="ConditionType"
       :ConditionModuleList="ConditionModuleList"
       :ConditionProductList="ConditionProductList"
+      :conditionObjectRetain.sync="conditionObjectRetain"
+      :conditionObject.sync="conditionObject"
       :destroyOnClose="true"
       @cancel="DataSourceFormVisible=false;DataSourceFormDefaultData = {}"
       @create="saveCustomModuleFormHandleCreate"

@@ -416,17 +416,20 @@
                   <svg-icon icon-class="listdrag-icon" class="handle"/>
                 </div>
                 <div class="ds_form_item_content">
-                  <a-input @change="paramChange()" placeholder="name" v-model="element.name" style="width:130px"/>
+                  <a-input @change="paramChange()" placeholder="name" v-model="element.name" :style="{width:form.getFieldValue('type')=='4'?'90px':'130px'}"/>
                   <div>:</div>
-                  <div style="width:300px;flex-shrink: 0;">
+                  <div :style="{width:form.getFieldValue('type')=='4'?'220px':'300px','flex-shrink':0}">
                     <a-switch @change="paramChange()" v-model="element.value" v-if="element.valueType=='1'"/>
                     <a-input @change="paramChange()" v-model="element.value" v-else-if="element.valueType=='2'" placeholder="请输入表达式（示例：@[data.value]）"  style="width:100%"/>
                     <a-input @change="paramChange()" v-model="element.value" v-else placeholder="请输入字符串" style="width:100%"/>
                   </div>
-                  <a-select @change="paramChange()" style="width:100px" allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
+                  <a-select @change="paramChange()" :style="{width:form.getFieldValue('type')=='4'?'90px':'100px'}" allowClear dropdownClassName="idm_dev_theme" v-model="element.valueType" :default-value="0">
                     <a-select-option :value="0">字符串</a-select-option>
                     <a-select-option :value="1">布尔</a-select-option>
                     <a-select-option :value="2">表达式</a-select-option>
+                  </a-select>
+                  <a-select v-if="form.getFieldValue('type')=='4'" @change="paramChange()" style="width:120px" allowClear dropdownClassName="idm_dev_theme" v-model="element.paramType" :default-value="0">
+                    <a-select-option v-for="si in paramTypeArray" :key="si" :value="si">{{si}}</a-select-option>
                   </a-select>
                   <div @click="deleteListRow('paramJson',index)">
                     <svg-icon icon-class="delete-icon"/>
@@ -892,6 +895,7 @@ export default {
   },
   data(){
       return {
+        paramTypeArray:["STRING","INTEGER","CHAR","BOOLEAN","DATE","DATE_TIME","NUMERIC","BINARY","BLOB","BIT","CLOB","FLOAT","OTHER"],
         paramEdit:false,
         moduleIntelfaceVisible:false,
         intelfaceDebugVisible:false,
@@ -960,6 +964,12 @@ export default {
     ConditionProductList:{
       type:Array,
       default:()=>{return []}
+    },
+    conditionObjectRetain:{
+      type:Object
+    },
+    conditionObject:{
+      type:Object
     }
   },
   beforeCreate() {
@@ -1451,7 +1461,7 @@ export default {
   },
   watch:{
     defaultValue:{
-      handler(){
+      handler(newV){
         //type   title   shareType   author   remark   groupId   tags    loadType   api   requestType   crossOrigin   resultJson   dbName   dbSql   file_name   functionParam   functionResult   functionError
         this.form.setFieldsValue({
           "type":this.defaultValue.type||"1",
@@ -1490,6 +1500,29 @@ export default {
         this.paramJson = this.defaultValue.paramJson? JSON.parse(this.defaultValue.paramJson):[];
         this.headerJson = this.defaultValue.headerJson?JSON.parse(this.defaultValue.headerJson):[];
         this.refreshJson = this.defaultValue.refreshJson?JSON.parse(this.defaultValue.refreshJson):[];
+        
+        let that = this;
+        if (!newV.isEditInfo) {
+            //新增，需要带过来
+            IDM.datasource.request("221202112015UVjRR8mwRBGaP0y2CeN",{
+              moduleObject:{},
+              param:{
+                conditionObjectRetain:this.conditionObjectRetain,
+                conditionObject:this.conditionObject
+              }
+            },function(resData){
+              if(resData&&resData.length>0){
+                //这里是请求成功的返回结果
+                that.form.setFieldsValue({
+                  "codeId":resData[0].ID,
+                  "productArray": [{key:resData[0].PRODUCT_ID,label:that.ConditionProductList.filter(item=>item.value==resData[0].PRODUCT_ID)[0].text}]
+                })
+              }
+            },function(error){
+              //这里是请求失败的返回结果
+              
+            })
+          }
       },
       deep: true,
     },

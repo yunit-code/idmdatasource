@@ -554,6 +554,12 @@ export default {
     ConditionProductList: {
       type: Array,
       default: () => []
+    },
+    conditionObjectRetain:{
+      type:Object
+    },
+    conditionObject:{
+      type:Object
     }
   },
   beforeCreate() {
@@ -1021,6 +1027,27 @@ export default {
             setTimeout(() => {
               this.needTest = false
             }, 500)
+          }else{
+            let that = this;
+            //新增，需要带过来
+            IDM.datasource.request("221202112015UVjRR8mwRBGaP0y2CeN",{
+              moduleObject:{},
+              param:{
+                conditionObjectRetain:this.conditionObjectRetain,
+                conditionObject:this.conditionObject
+              }
+            },function(resData){
+              if(resData&&resData.length>0){
+                //这里是请求成功的返回结果
+                that.form.setFieldsValue({
+                  "codeId":resData[0].ID,
+                  "productArray": [{key:resData[0].PRODUCT_ID,label:that.ConditionProductList.filter(item=>item.value==resData[0].PRODUCT_ID)[0].text}]
+                })
+              }
+            },function(error){
+              //这里是请求失败的返回结果
+              
+            })
           }
         })
       },
