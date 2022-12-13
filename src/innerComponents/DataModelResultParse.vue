@@ -34,7 +34,7 @@
           v-model="record.showName" />
         <!-- 关联父级字段 -->
         <a-select placeholder="关联父级字段" size="small" style="width: 220%" @change="handleGenerateBottomTable"
-          v-if="record.dataType == 1" v-model="record.fidFiled">
+          v-if="record.dataType == 1" v-model="record.fidFiled" allowClear>
           <a-select-option v-for="item, index in getParentFields(record)" :key="index" :value="item.customName">{{
               item.customName
           }}
@@ -198,7 +198,7 @@ export default {
               ...el,
               // 用父级自定义字段名，在父级的字段中，找关联的关系对象
               relationFileInfo: this.getParentFields(el).find(els => els.customName == el.fidFiled) || {},
-              relationTableFiled: (!parentObj.customTableName && !el.fidFiled) ? '' : (parentObj.customTableName ? parentObj.customTableName : '') + '_' + el.fidFiled,
+              relationTableFiled: (!parentObj.customTableName && !el.fidFiled) ? '' : (parentObj.customTableName ? parentObj.customTableName : '') + '_' + (el.fidFiled ? el.fidFiled : ''),
               columns,
               tableData: [tableItemData]
             }
