@@ -289,11 +289,11 @@ export default {
       if (selected) {
         set.add(id);
         record.children && setChildCheck(record.children);
-        setParentCheck(id);
+        // setParentCheck(id);
       } else {
         set.delete(id);
         record.children && setChildUncheck(record.children);
-        setParentUncheck(id);
+        // setParentUncheck(id);
       }
       this.selectedRowKeys = Array.from(set);
       // 设置父级选择

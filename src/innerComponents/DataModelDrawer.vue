@@ -870,7 +870,6 @@ export default {
         this.paramEdit = true;
       }
       this[name].push({ name: "", value: "", valueType: 0 })
-
       this.form.setFieldsValue({ [name]: JSON.stringify(this[name]) });
     },
     //code改变要设置到form中
