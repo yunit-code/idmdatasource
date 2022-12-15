@@ -902,7 +902,7 @@ export default {
       this.fileList = fileList;
       if (file && file.status == "removed") {
         selectList && selectList.forEach((fitem, index) => {
-          const isExists = fileList.filter(item => item.uid == fitem.uid);
+          const isExists = fileList?.filter(item => item.uid == fitem.uid);
           if (!isExists || (isExists && isExists.length == 0)) {
             selectList.splice(index, 1)
           }
@@ -1022,6 +1022,7 @@ export default {
           if (newV.isEditInfo) {
             this.$refs['dataModelResultParse']?.setDefaultValue(newV)
             this.$refs['dataModelUpdateSetting']?.setDefaultValue(newV)
+            this.sqlEditorLoaded()
             // 不用测试
             setTimeout(() => {
               this.needTest = false
@@ -1039,7 +1040,7 @@ export default {
               if(resData&&resData.length>0){
                 //这里是请求成功的返回结果
                 that.form.setFieldsValue({
-                  "codeId":resData[0].ID,
+                  "codeId":resData?.[0]?.ID,
                   "productArray": [{key:resData[0].PRODUCT_ID,label:that.ConditionProductList.filter(item=>item.value==resData[0].PRODUCT_ID)[0].text}]
                 })
               }
