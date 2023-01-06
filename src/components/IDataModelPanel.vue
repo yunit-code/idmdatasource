@@ -471,10 +471,10 @@ export default {
       // 修改, 不让修改类型
       if (record) {
         // 数据源类型, 显示数据源弹框
-        if (record.type == 1) {
-          this.dataSourceSelectShow = true
-          return
-        }
+        // if (record.type == 1) {
+        //   this.dataSourceSelectShow = true
+        //   return
+        // }
         this.dataModalDrawerShow = true
       } else {
         // 新增
